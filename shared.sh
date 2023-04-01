@@ -39,7 +39,7 @@ run_all(){
 		core=${SPEC_CORES[i]}
 		#2>1 >/dev/null taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
 		taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
-		echo "$bench: pid-$!" | tee -a $SPEC_LOG
+		echo "run-cpu-initial-$bench: pid-$!" | tee -a $SPEC_LOG
 	done
 
 	sleep 3
@@ -63,6 +63,7 @@ function kill_bench {
 }
 
 function kill_all {
+	kill_bench workload_generator
 	for ((i=0;i<${#BENCHS[@]};++i)); do
 		bench=${BENCHS[i]}
 		kill_bench $bench
