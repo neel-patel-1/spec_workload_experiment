@@ -8,4 +8,4 @@ do
 	echo "$2 (pid: $3) still running" | tee -a $MON_LOG
 done
 echo "$2 finished -- starting background" | tee -a $MON_LOG
-taskset -c $1 runcpu --nobuild --action onlyrun --output-root $BACKGROUND_OUTPUT $2
+taskset -c $1 runcpu --nobuild --action onlyrun --output-root $SPEC_OUTPUT $2

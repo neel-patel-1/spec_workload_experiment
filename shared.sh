@@ -15,7 +15,6 @@ MON_CORE="0" #only check for workload completion and handle experiment terminati
 
 build_bench(){
 	runcpu --action runsetup --output-root $SPEC_OUTPUT $1
-	runcpu --action runsetup --output-root $BACKGROUND_OUTPUT $1
 }
 clear_build(){
 	go $1
@@ -40,14 +39,17 @@ run_all(){
 		core=${SPEC_CORES[i]}
 		#2>1 >/dev/null taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
 		taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
+		echo "$bench: pid-$!" | tee -a $SPEC_LOG
 	done
 
 	sleep 3
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
-		[ -z "$(pgrep $bench)" ] && echo "Could not find running $bench" && return -1
+		while [ -z "$(pgrep $bench)" ]; do echo "waiting to find running $bench" | tee -a $MON_LOG ; done
+		echo "taskset -c $MON_CORE ./workload_replicator.sh $core $bench $(pgrep $bench) &" | tee -a $MON_LOG
 		taskset -c $MON_CORE ./workload_replicator.sh $core $bench $(pgrep $bench) &
+		echo "$bench: workload-replicator-pid-$!" | tee -a $MON_LOG
 	done
 
 	taskset -c $MON_CORE ./experiment_terminator.sh
