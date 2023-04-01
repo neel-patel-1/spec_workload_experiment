@@ -6,8 +6,12 @@ SPEC_OUTPUT=~/spec_out
 BACKGROUND_OUTPUT=~/spec_background
 #BENCHS=( "cactuBSSN_s" "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
 BENCHS=(  "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
-#CORES=( "0" "1" "2" "3" )
-CORES=(  "1" "2" "3" )
+#SPEC_CORES=( "0" "1" "2" "3" )
+SPEC_CORES=(  "1" "2" "3" )
+SPEC_LOG=spec_log.txt
+MON_LOG=mon_log.txt
+
+MON_CORE="0" #only check for workload completion and handle experiment termination
 
 build_bench(){
 	runcpu --action runsetup --output-root $SPEC_OUTPUT $1
@@ -26,38 +30,27 @@ build_all(){
 }
 
 
-launch_bench(){
-	taskset -c $1 runcpu --nobuild --action run --output-root $SPEC_OUTPUT $2
-}
-launch_workload_replicator(){
-	while [ -e /proc/$3 ];
-	do
-		sleep 5
-	done
-	taskset -c $1 runcpu --nobuild --action onlyrun --output-root $BACKGROUND_OUTPUT $2
-}
-
-spec_proc(){
-	echo $$
-	wait
-
-	launch_bench_onlyrun $1 $2
-}
 
 run_all(){
 	RUNNING_SPECS=()
-	echo > og_pids.txt
-	for ((i=0;i<${#CORES[@]};++i)); do
+	echo > $SPEC_LOG
+	echo > $MON_LOG
+	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
-		core=${CORES[i]}
-		2>1 >/dev/null launch_bench $core $bench & 
-		pid=$!
-		echo "$bench pid: $pid" | tee -a og_pids.txt
-		RUNNING_SPECS+=( "$pid" )
-		2>1 >/dev/null launch_workload_replicator $core $bench $pid &
+		core=${SPEC_CORES[i]}
+		#2>1 >/dev/null taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
+		taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
 	done
 
-	echo ${RUNNING_SPECS[*]} | tee -a og_pids.txt
+	sleep 3
+	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
+		bench=${BENCHS[i]}
+		core=${SPEC_CORES[i]}
+		[ -z "$(pgrep $bench)" ] && echo "Could not find running $bench" && return -1
+		taskset -c $MON_CORE ./workload_replicator.sh $core $bench $(pgrep $bench) &
+	done
+
+	taskset -c $MON_CORE ./experiment_terminator.sh
 }
 
 function kill_bench {
