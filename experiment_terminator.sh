@@ -20,4 +20,6 @@ done
 echo "all reportable spec procs ended, terminating experiment..." | tee -a $MON_LOG
 
 sudo kill `pgrep workload_rep` #TODO: why does pgrep only return pids for truncated script name
+sudo kill `pgrep antagonist`
+sudo kill `pgrep "test"` 
 kill_all_bench

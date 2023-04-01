@@ -5,4 +5,6 @@ workload\_replicator.sh - starts passed in workload on the provided core after w
 
 experiment\_terminator.sh - terminates all running antagonists and background spec jobs after all reportable spec runs have completed
 
-run.sh - executes spec workloads on cores assigned in shared.sh 
+compression\_antagonist.sh - compresses pages on assigned cores
+
+run.sh - executes spec workloads on spec\_cores and (de)compression workloads on comp\_cores assigned in shared.sh 

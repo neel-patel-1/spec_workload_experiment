@@ -1,17 +1,21 @@
 #!/bin/bash
 
-TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-SPEC_ROOT=~/spec
-SPEC_OUTPUT=~/spec_out
-BACKGROUND_OUTPUT=~/spec_background
+export TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export SPEC_ROOT=~/spec
+export SPEC_OUTPUT=$TEST/spec_out
+export BACKGROUND_OUTPUT=$TEST/spec_background
 #BENCHS=( "cactuBSSN_s" "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
-BENCHS=(  "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
+#BENCHS=(  "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
 #SPEC_CORES=( "0" "1" "2" "3" )
-SPEC_CORES=(  "1" "2" "3" )
-SPEC_LOG=spec_log.txt
-MON_LOG=mon_log.txt
+#SPEC_CORES=(  "1" "2" "3" )
+export SPEC_LOG=spec_log.txt
+export MON_LOG=mon_log.txt
 
-MON_CORE="0" #only check for workload completion and handle experiment termination
+export QZ_ROOT=$TEST/../QATzip
+export ANTAGONIST=$TEST/../antagonist.sh
+export COMP_CORES=(  "4" "5"  )
+
+export MON_CORE="0" #only check for workload completion and handle experiment termination
 
 build_bench(){
 	runcpu --action runsetup --output-root $SPEC_OUTPUT $1
@@ -34,6 +38,12 @@ run_all(){
 	RUNNING_SPECS=()
 	echo > $SPEC_LOG
 	echo > $MON_LOG
+
+	for ((i=0;i<${#COMP_CORES[@]};++i)); do
+		core=${COMP_CORES[i]}
+		taskset -c $core $TEST/../antagonist.sh 2>&1 | tee -a $TEST/antagonist_stats_core_$core &
+	done
+
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
@@ -42,7 +52,7 @@ run_all(){
 		echo "run-cpu-initial-$bench: pid-$!" | tee -a $SPEC_LOG
 	done
 
-	sleep 3
+	sleep 4
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
