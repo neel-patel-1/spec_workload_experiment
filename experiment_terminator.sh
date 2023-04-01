@@ -4,9 +4,8 @@ source shared.sh
 
 rs=()
 for i in ${BENCHS[@]}; do 
-	echo "$i"
-	pidwait $i | tee -a $MON_LOG
-	rs+=( "$(pidwait $i)" ) 
+	echo "exp_term pid enumeration: $i -- $(pgrep $i)" | tee -a $MON_LOG
+	[ ! -z "$(pgrep $i)" ] && rs+=( "$(pgrep $i)" ) 
 done
 
 echo "waiting on: ${rs[@]} before terminating" | tee -a $MON_LOG
