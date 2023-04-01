@@ -9,4 +9,5 @@ mkdir -p $SPEC_OUTPUT
 mkdir -p $BACKGROUND_OUTPUT
 mkdir -p $ANTAGONIST_OUTPUT
 
+build_all
 run_all
