@@ -57,13 +57,12 @@ run_all(){
 
 function kill_bench {
     pid=`pgrep $1`
+	echo "killing $1: $pid" | tee -a $MON_LOG
     if [ -n "$pid" ]; then
 	{ sudo kill $pid && sudo wait $pid; } 2>/dev/null
     fi
 }
-
-function kill_all {
-	kill_bench workload_generator
+function kill_all_bench {
 	for ((i=0;i<${#BENCHS[@]};++i)); do
 		bench=${BENCHS[i]}
 		kill_bench $bench
