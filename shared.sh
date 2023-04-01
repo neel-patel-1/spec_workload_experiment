@@ -4,16 +4,19 @@ export TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export SPEC_ROOT=~/spec
 export SPEC_OUTPUT=$TEST/spec_out
 export BACKGROUND_OUTPUT=$TEST/spec_background
-#BENCHS=( "cactuBSSN_s" "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
-#BENCHS=(  "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
-#SPEC_CORES=( "0" "1" "2" "3" )
-#SPEC_CORES=(  "1" "2" "3" )
+
+SPEC_CORES=( `seq 1 3` )
+BENCHS=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
+SPEC_CORES+=( `seq 11 13` )
+BENCHS+=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
+
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
 
 export QZ_ROOT=$TEST/../QATzip
 export ANTAGONIST=$TEST/../antagonist.sh
-export COMP_CORES=(  "4" "5"  )
+export ANTAGONIST_OUTPUT=$TEST/antagonist
+export COMP_CORES=(  "9" "19"  )
 
 export MON_CORE="0" #only check for workload completion and handle experiment termination
 
@@ -41,7 +44,7 @@ run_all(){
 
 	for ((i=0;i<${#COMP_CORES[@]};++i)); do
 		core=${COMP_CORES[i]}
-		taskset -c $core $TEST/../antagonist.sh 2>&1 | tee -a $TEST/antagonist_stats_core_$core &
+		taskset -c $core $TEST/../antagonist.sh 2>&1 | tee -a $ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
 	done
 
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
@@ -52,7 +55,7 @@ run_all(){
 		echo "run-cpu-initial-$bench: pid-$!" | tee -a $SPEC_LOG
 	done
 
-	sleep 4
+	sleep 10
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
