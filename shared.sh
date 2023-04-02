@@ -5,11 +5,10 @@ export SPEC_ROOT=~/spec
 export SPEC_OUTPUT=$TEST/spec_out
 export BACKGROUND_OUTPUT=$TEST/spec_background
 
-SPEC_CORES=( `seq 1 3` )
-BENCHS=( "lbm_s" "mcf_s" "mcf_s"  ) #memory intensive workloads
-#BENCHS=( "lbm_s" "xz_s" "xz_s"  ) #duplicate workload test
-#SPEC_CORES+=( `seq 11 13` )
-#BENCHS+=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
+SPEC_CORES=( `seq 1 8` )
+BENCHS=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" "roms_s" ) #memory intensive workloads
+SPEC_CORES+=( `seq 11 18` )
+BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" "roms_s" ) #memory intensive workloads
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
@@ -17,7 +16,7 @@ export MON_LOG=mon_log.txt
 export QZ_ROOT=$TEST/../QATzip
 export ANTAGONIST=$TEST/../antagonist.sh
 export ANTAGONIST_OUTPUT=$TEST/antagonist
-export COMP_CORES=(  "0"  )
+export COMP_CORES=( "9" "19"  )
 
 export MON_CORE="0" #only check for workload completion and handle experiment termination
 
@@ -80,22 +79,20 @@ launch_antagonists(){
 	done
 }
 
-
-run_all(){
-	RUNNING_SPECS=()
+run_all_spec_no_antagonist(){
 	echo > $SPEC_LOG
 	echo > $MON_LOG
-
-
-	launch_antagonists
-
 	launch_reportable_specs
-
-	#sleep 10
 	launch_workload_replicators
-
-	taskset -c $MON_CORE ./experiment_terminator.sh &
-
+	taskset -c $MON_CORE ./experiment_terminator.sh
+}
+run_all_spec_with_antagonist(){
+	echo > $SPEC_LOG
+	echo > $MON_LOG
+	launch_antagonists
+	launch_reportable_specs
+	launch_workload_replicators
+	taskset -c $MON_CORE ./experiment_terminator.sh
 }
 
 function kill_bench {
