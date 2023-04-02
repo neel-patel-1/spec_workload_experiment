@@ -35,6 +35,15 @@ build_all(){
 	done
 }
 
+uniq_spec_pids(){
+	rs=()
+	for i in ${BENCHS[@]}; do 
+		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
+	done
+	uniq_pids=( `printf "%s\n"  "${rs[@]}" | sort | uniq` )
+	echo "${uniq_pids[*]}"
+}
+
 launch_reportable_specs(){
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
@@ -46,8 +55,10 @@ launch_reportable_specs(){
 }
 launch_workload_replicators(){
 	# 1 - wait for all benchmarks to launch
-	while [ `pgrep "$( echo "${BENCHS[*]}" | sed 's/ /|/g')" | wc -l` -lt "${#BENCHS[@]}" ]; do
+	uniq_pids=( $( uniq_spec_pids ) )
+	while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
 		sleep 2
+		uniq_pids=( $( uniq_spec_pids ) )
 		echo "Waiting for all spec benchs to start" | tee -a $MON_LOG
 	done
 
