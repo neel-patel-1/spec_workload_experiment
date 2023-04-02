@@ -7,8 +7,9 @@ export BACKGROUND_OUTPUT=$TEST/spec_background
 
 SPEC_CORES=( `seq 1 3` )
 BENCHS=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
-SPEC_CORES+=( `seq 11 13` )
-BENCHS+=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
+#BENCHS=( "lbm_s" "xz_s" "xz_s"  ) #duplicate workload test
+#SPEC_CORES+=( `seq 11 13` )
+#BENCHS+=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
@@ -35,18 +36,7 @@ build_all(){
 	done
 }
 
-
-
-run_all(){
-	RUNNING_SPECS=()
-	echo > $SPEC_LOG
-	echo > $MON_LOG
-
-	for ((i=0;i<${#COMP_CORES[@]};++i)); do
-		core=${COMP_CORES[i]}
-		taskset -c $core $TEST/../antagonist.sh 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
-	done
-
+launch_reportable_specs(){
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
@@ -54,16 +44,52 @@ run_all(){
 		taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench 2>&1 | tee -a $SPEC_OUTPUT/spec_reportable_core_$core &
 		echo "run-cpu-initial-$bench: pid-$!" | tee -a $SPEC_LOG
 	done
+}
+launch_workload_replicators(){
+	# 1 - wait for all benchmarks to launch
+	while [ `pgrep "$( echo "${BENCHS[*]}" | sed 's/ /|/g')" | wc -l` -lt "${#BENCHS[@]}" ]; do
+		sleep 2
+		echo "Waiting for all spec benchs to start" | tee -a $MON_LOG
+	done
+
+	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
+	uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | uniq` )
+	for i in "${uniq_benchs[@]}"; do
+		rem_pids=( $(pgrep $i) )
+		for ((j=0;j<${#BENCHS[@]};++j)); do
+			bench=${BENCHS[i]}
+			core=${SPEC_CORES[i]}
+			if [ "$i" -eq "$bench" ]; then
+				pid=${rem_pids[0]} 
+				rem_pids=( "${rem_pids[@]:0}" )
+				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
+				echo "assigning workload_replicator for $bench with pid $pid to core $core" | tee -a $MON_LOG
+
+				echo "taskset -c $MON_CORE ./workload_replicator.sh $core $bench $(pgrep $bench) &" | tee -a $MON_LOG
+				taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_OUTPUT/workload_rep_core_$core &
+			fi
+		done
+	done
+}
+launch_antagonists(){
+	for ((i=0;i<${#COMP_CORES[@]};++i)); do
+		core=${COMP_CORES[i]}
+		taskset -c $core $TEST/../antagonist.sh 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
+	done
+}
+
+
+run_all(){
+	RUNNING_SPECS=()
+	echo > $SPEC_LOG
+	echo > $MON_LOG
+
+
+	launch_antagonists
 
 	#sleep 10
-	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
-		bench=${BENCHS[i]}
-		core=${SPEC_CORES[i]}
-		while [ -z "$(pgrep $bench)" ]; do echo "waiting to find running $bench" | tee -a $MON_LOG ; done
-		echo "taskset -c $MON_CORE ./workload_replicator.sh $core $bench $(pgrep $bench) &" | tee -a $MON_LOG
-		taskset -c $MON_CORE ./workload_replicator.sh $core $bench $(pgrep $bench) 2>&1 1>$SPEC_OUTPUT/workload_rep_core_$core &
-		echo "$bench: workload-replicator-pid-$!" | tee -a $MON_LOG
-	done
+	launch_workload_replicators
+
 	taskset -c $MON_CORE ./experiment_terminator.sh
 
 }
