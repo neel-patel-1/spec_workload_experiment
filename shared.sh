@@ -70,9 +70,9 @@ launch_workload_replicators(){
 			bench=${BENCHS[j]}
 			core=${SPEC_CORES[j]}
 			if [ "$i" == "$bench" ]; then
+				echo "remaining $i pids for assignment : ${rem_pids[*]}" | tee -a $MON_LOG
 				pid=${rem_pids[0]}
 				rem_pids=( ${rem_pids[@]/$pid/} )
-				echo "remaining pids for $i : ${rem_pids[*]}" | tee -a $MON_LOG
 				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
 				echo "assigning workload_replicator for $bench with pid $pid to core $core" | tee -a $MON_LOG
 
