@@ -4,13 +4,13 @@ source shared.sh
 
 rs=()
 for i in ${BENCHS[@]}; do 
-	echo "exp_term pid enumeration: $i -- $(pgrep $i)" | tee -a $MON_LOG
-	[ ! -z "$(pgrep $i)" ] && rs+=( "$(pgrep $i)" ) 
+	[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
 done
+uniq_pids=( `printf "%s\n"  "${rs[@]}" | sort | uniq` )
 
-echo "waiting on: ${rs[@]} before terminating" | tee -a $MON_LOG
+echo "waiting on: ${uniq_pids[*]} before terminating" | tee -a $MON_LOG
 
-for i in "${rs[@]}"; do
+for i in "${uniq_pids[@]}"; do
 	while [ -e /proc/$i ]; do
 		sleep 3;
 	done

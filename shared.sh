@@ -6,7 +6,7 @@ export SPEC_OUTPUT=$TEST/spec_out
 export BACKGROUND_OUTPUT=$TEST/spec_background
 
 SPEC_CORES=( `seq 1 3` )
-BENCHS=( "lbm_s" "xz_s" "xz_s"  ) #memory intensive workloads
+BENCHS=( "lbm_s" "mcf_s" "mcf_s"  ) #memory intensive workloads
 #BENCHS=( "lbm_s" "xz_s" "xz_s"  ) #duplicate workload test
 #SPEC_CORES+=( `seq 11 13` )
 #BENCHS+=( "lbm_s" "xz_s" "mcf_s"  ) #memory intensive workloads
@@ -53,7 +53,7 @@ launch_workload_replicators(){
 	done
 
 	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
-	uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | uniq` )
+	uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | sort | uniq` )
 	for i in "${uniq_benchs[@]}"; do
 		rem_pids=( $(pgrep $i) )
 		for ((j=0;j<${#BENCHS[@]};++j)); do
@@ -61,7 +61,7 @@ launch_workload_replicators(){
 			core=${SPEC_CORES[j]}
 			if [ "$i" == "$bench" ]; then
 				pid=${rem_pids[0]}
-				rem_pids=( ${rem_pids[@]:0} )
+				rem_pids=( ${rem_pids[@]/$pid/} )
 				echo "remaining pids for $i : ${rem_pids[*]}" | tee -a $MON_LOG
 				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
 				echo "assigning workload_replicator for $bench with pid $pid to core $core" | tee -a $MON_LOG
