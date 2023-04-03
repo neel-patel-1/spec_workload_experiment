@@ -73,6 +73,7 @@ launch_workload_replicators(){
 	done
 }
 launch_antagonists(){
+	sudo $QZ_ROOT/test/performance_tests/setup_qat_devices.sh
 	for ((i=0;i<${#COMP_CORES[@]};++i)); do
 		core=${COMP_CORES[i]}
 		taskset -c $core $TEST/../antagonist.sh 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
