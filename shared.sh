@@ -35,6 +35,15 @@ build_all(){
 	done
 }
 
+uniq_spec_pids(){
+	rs=()
+	for i in ${BENCHS[@]}; do 
+		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
+	done
+	uniq_pids=( `printf "%s\n"  "${rs[@]}" | sort | uniq` )
+	echo "${uniq_pids[*]}"
+}
+
 launch_reportable_specs(){
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
@@ -46,8 +55,10 @@ launch_reportable_specs(){
 }
 launch_workload_replicators(){
 	# 1 - wait for all benchmarks to launch
-	while [ `pgrep "$( echo "${BENCHS[*]}" | sed 's/ /|/g')" | wc -l` -lt "${#BENCHS[@]}" ]; do
+	uniq_pids=( $( uniq_spec_pids ) )
+	while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
 		sleep 2
+		uniq_pids=( $( uniq_spec_pids ) )
 		echo "Waiting for all spec benchs to start" | tee -a $MON_LOG
 	done
 
@@ -59,9 +70,9 @@ launch_workload_replicators(){
 			bench=${BENCHS[j]}
 			core=${SPEC_CORES[j]}
 			if [ "$i" == "$bench" ]; then
+				echo "remaining $i pids for assignment : ${rem_pids[*]}" | tee -a $MON_LOG
 				pid=${rem_pids[0]}
 				rem_pids=( ${rem_pids[@]/$pid/} )
-				echo "remaining pids for $i : ${rem_pids[*]}" | tee -a $MON_LOG
 				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
 				echo "assigning workload_replicator for $bench with pid $pid to core $core" | tee -a $MON_LOG
 
