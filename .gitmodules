@@ -1,0 +1,3 @@
+[submodule "lzbench"]
+	path = lzbench
+	url = git@github.com:neel-patel-1/lzbench.git
