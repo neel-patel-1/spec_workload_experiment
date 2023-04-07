@@ -66,9 +66,12 @@ launch_workload_replicators(){
 	done
 
 	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
-	uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" "${BENCH_IDS[@]}" | sort | uniq` )
+	ID_itr=0
+	uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" | sort | uniq` )
 	for i in "${uniq_benchs[@]}"; do
 		rem_pids=( $(pgrep $i) )
+		[ -z "$rem_pids" ] && rem_pids=( $(pgrep ${BENCH_IDS[$ID_itr]}) ) && ID_itr=$(( $ID_itr + 1 ))
+		[ -z "$rem_pids" ] && echo "pids for $i not found" | tee -a $MON_LOG && return -1
 		for ((j=0;j<${#BENCHS[@]};++j)); do
 			bench=${BENCHS[j]}
 			core=${SPEC_CORES[j]}
@@ -76,8 +79,8 @@ launch_workload_replicators(){
 				echo "remaining $i pids for assignment : ${rem_pids[*]}" | tee -a $MON_LOG
 				pid=${rem_pids[0]}
 				rem_pids=( ${rem_pids[@]/$pid/} )
-				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
 				echo "assigning workload_replicator for $bench with pid $pid to core $core" | tee -a $MON_LOG
+				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
 
 				echo "taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_OUTPUT/workload_rep_core_$core &" | tee -a $MON_LOG
 				taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_OUTPUT/workload_rep_core_$core &
