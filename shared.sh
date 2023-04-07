@@ -39,6 +39,9 @@ uniq_spec_pids(){
 	for i in ${BENCHS[@]}; do 
 		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
 	done
+	for i in ${BENCH_IDS[@]}; do 
+		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
+	done
 	uniq_pids=( `printf "%s\n"  "${rs[@]}" | sort | uniq` )
 	echo "${uniq_pids[*]}"
 }
@@ -58,7 +61,7 @@ launch_workload_replicators(){
 	while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
 		sleep 2
 		uniq_pids=( $( uniq_spec_pids ) )
-		echo "Waiting for all spec benchs to start ${#unique_pids[@]}/${#BENCHS[@]}" | tee -a $MON_LOG
+		echo "Waiting for all spec benchs to start ${#uniq_pids[@]}/${#BENCHS[@]}" | tee -a $MON_LOG
 	done
 
 	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
