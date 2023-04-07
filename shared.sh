@@ -5,18 +5,17 @@ export SPEC_ROOT=~/spec
 export SPEC_OUTPUT=$TEST/spec_out
 export BACKGROUND_OUTPUT=$TEST/spec_background
 
-SPEC_CORES=( `seq 1 8` )
-BENCHS=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" "roms_s" ) #memory intensive workloads
-SPEC_CORES+=( `seq 11 18` )
-BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" "roms_s" ) #memory intensive workloads
-BENCH_IDS=( "sroms" )
+SPEC_CORES=( `seq 2 8` )
+BENCHS=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
+SPEC_CORES+=( `seq 12 18` )
+BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
 
 export ANTAGONIST=$TEST/antagonist.sh
 export ANTAGONIST_OUTPUT=$TEST/antagonist
-export COMP_CORES=( "9" "19"  )
+export COMP_CORES=( "1" "9" "11" "19"  )
 
 export MON_CORE="0" #only check for workload completion and handle experiment termination
 
