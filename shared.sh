@@ -66,7 +66,7 @@ launch_workload_replicators(){
 	done
 
 	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
-	uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | sort | uniq` )
+	uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" "${BENCH_IDS[@]}" | sort | uniq` )
 	for i in "${uniq_benchs[@]}"; do
 		rem_pids=( $(pgrep $i) )
 		for ((j=0;j<${#BENCHS[@]};++j)); do
