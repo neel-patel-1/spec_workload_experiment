@@ -58,7 +58,7 @@ launch_workload_replicators(){
 	while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
 		sleep 2
 		uniq_pids=( $( uniq_spec_pids ) )
-		echo "Waiting for all spec benchs to start" | tee -a $MON_LOG
+		echo "Waiting for all spec benchs to start ${#unique_pids[@]}/${#BENCHS[@]}" | tee -a $MON_LOG
 	done
 
 	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
