@@ -13,8 +13,7 @@ BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlb
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
 
-export QZ_ROOT=$TEST/../QATzip
-export ANTAGONIST=$TEST/../antagonist.sh
+export ANTAGONIST=$TEST/antagonist.sh
 export ANTAGONIST_OUTPUT=$TEST/antagonist
 export COMP_CORES=( "9" "19"  )
 
@@ -84,10 +83,9 @@ launch_workload_replicators(){
 	done
 }
 launch_antagonists(){
-	sudo $QZ_ROOT/test/performance_tests/setup_qat_devices.sh
 	for ((i=0;i<${#COMP_CORES[@]};++i)); do
 		core=${COMP_CORES[i]}
-		taskset -c $core $TEST/../antagonist.sh 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
+		taskset -c $core $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
 	done
 }
 
