@@ -117,10 +117,23 @@ function kill_bench {
     fi
 }
 function kill_all_bench {
-	for ((i=0;i<${#BENCHS[@]};++i)); do
-		bench=${BENCHS[i]}
+	uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" "${BENCH_IDS[@]}" | sort | uniq` )
+	for i in "${uniq_benchs[@]}"; do
+		bench=$i
 		kill_bench $bench
 	done
+}
+function kill_antagonist {
+	sudo kill `pgrep antagonist` >& /dev/null
+	sudo kill `pgrep "lzbench"`  >& /dev/null
+}
+function kill_workload_replicator {
+	sudo kill `pgrep workload_rep` >& /dev/null #TODO: why does pgrep only return pids for truncated script name
+}
+function kill_experiment {
+	kill_workload_replicator
+	kill_antagonist
+	kill_all_bench
 }
 
 cd $SPEC_ROOT
