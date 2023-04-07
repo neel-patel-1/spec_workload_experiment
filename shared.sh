@@ -9,7 +9,7 @@ SPEC_CORES=( `seq 1 8` )
 BENCHS=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" "roms_s" ) #memory intensive workloads
 SPEC_CORES+=( `seq 11 18` )
 BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" "roms_s" ) #memory intensive workloads
-BENCH_IDS= ( "sroms" )
+BENCH_IDS=( "sroms" )
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
