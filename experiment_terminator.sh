@@ -2,13 +2,18 @@
 
 source shared.sh
 
+warn_freq=60
+
 uniq_pids=( $( uniq_spec_pids ) )
 
 echo "waiting on: ${uniq_pids[*]} before terminating" | tee -a $MON_LOG
 
+itr=0
 for i in "${uniq_pids[@]}"; do
 	while [ -e /proc/$i ]; do
 		sleep 3;
+		itr=$(( $itr + 1 ))
+		[ "$itr" = "$(( $warn_freq / 3))" ] && wall "*** Experiment in Progress ***"
 	done
 done
 
