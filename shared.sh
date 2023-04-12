@@ -4,6 +4,7 @@ export TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export SPEC_ROOT=~/spec
 export SPEC_OUTPUT=$TEST/spec_out
 export BACKGROUND_OUTPUT=$TEST/spec_background
+export REPORTABLE=0
 
 SPEC_CORES=( `seq 2 8` )
 BENCHS=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
@@ -47,6 +48,7 @@ uniq_spec_pids(){
 }
 
 launch_reportable_specs(){
+	[ "$REPORTABLE" = "1" ] && wall "*** Experiment Starting in ~2min ***"
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
