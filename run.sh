@@ -8,7 +8,7 @@ mkdir -p $ANTAGONIST_OUTPUT
 
 
 build_all
-run_all_spec_with_antagonist
+run_all_spec_no_antagonist
 
 mkdir -p antagonist_spec_output
 cp -r $SPEC_OUTPUT antagonist_spec_output

@@ -1,14 +1,14 @@
 #!/bin/bash
 
 export TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-export SPEC_ROOT=~/spec
+export SPEC_ROOT=/home/n869p538/spec
 export SPEC_OUTPUT=$TEST/spec_out
 export BACKGROUND_OUTPUT=$TEST/spec_background
 
-SPEC_CORES=( `seq 2 8` )
-BENCHS=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
-SPEC_CORES+=( `seq 12 18` )
-BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
+SPEC_CORES=( 1 2 3 5 6 7 9 10 11 )
+BENCHS=( "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" ) #memory intensive workloads
+#SPEC_CORES+=( `seq 12 18` )
+#BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
