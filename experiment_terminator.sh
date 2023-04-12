@@ -13,7 +13,7 @@ for i in "${uniq_pids[@]}"; do
 	while [ -e /proc/$i ]; do
 		sleep 3;
 		itr=$(( $itr + 1 ))
-		[ "$(( itr % 20 ))" = "0" ] && wall "*** Experiment in Progress ***"
+		[ "$REPORTABLE" = "1" ] && [ "$(( itr % 20 ))" = "0" ] && wall "*** Experiment in Progress ***"
 	done
 done
 
