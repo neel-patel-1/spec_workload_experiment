@@ -99,7 +99,7 @@ launch_antagonists(){
 	done
 }
 launch_antagonist_threads(){
-	taskset -c $(echo ${COMP_CORES[*]} | sed -e 's/ /,/g' -e 's/,$//') $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_log.txt &
+	stdbuf -o0 taskset -c $(echo ${COMP_CORES[*]} | sed -e 's/ /,/g' -e 's/,$//') $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_log.txt &
 }
 
 run_all_spec_no_replacement(){

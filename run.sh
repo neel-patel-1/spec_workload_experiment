@@ -11,5 +11,5 @@ mkdir -p $ANTAGONIST_OUTPUT
 build_all
 run_all_spec_no_replacement
 
-mkdir -p no_replacement_run
-cp -r $SPEC_OUTPUT no_replacement_run
+mkdir -p antagonist_lbm_s_6x
+cp -r $SPEC_OUTPUT antagonist_lbm_s_6x
