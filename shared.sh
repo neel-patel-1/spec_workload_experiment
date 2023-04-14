@@ -3,20 +3,22 @@
 export TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export SPEC_ROOT=/home/n869p538/spec
 export SPEC_OUTPUT=$TEST/spec_out
-export BACKGROUND_OUTPUT=$TEST/spec_background
+export SPEC_CORE_OUTPUT=$TEST/spec_out/spec_cores
+export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
 export REPORTABLE=0
 
-SPEC_CORES=( 1 2 3 5 6 7 9 10 11 )
-BENCHS=( "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" ) #memory intensive workloads
-#SPEC_CORES+=( `seq 12 18` )
-#BENCHS+=( "lbm_s" "mcf_s" "omnetpp_s" "gcc_r" "cactuBSSN_s" "fotonik3d_s" "perlbench_s" ) #memory intensive workloads
+SPEC_CORES=( 1 2 3 4 5 6 7 8 9 10 11 )
+SPEC_CORES=( 1 2   4 5   7 8 )
+#BENCHS=( "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" ) #memory intensive workloads
+#BENCHS=( "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" ) #memory intensive workloads
+BENCHS=( "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" ) #memory intensive workloads
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
 
 export ANTAGONIST=$TEST/antagonist.sh
-export ANTAGONIST_OUTPUT=$TEST/antagonist
-export COMP_CORES=( "1" "9" "11" "19"  )
+export ANTAGONIST_OUTPUT=$TEST/antagonist_output
+export COMP_CORES=( "3" "6" )
 
 export MON_CORE="0" #only check for workload completion and handle experiment termination
 
@@ -29,7 +31,8 @@ clear_build(){
 }
 
 build_all(){
-	for ((i=0;i<${#BENCHS[@]};++i)); do
+	uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | sort | uniq` )
+	for bench in "${uniq_benchs[@]}"; do
 		bench=${BENCHS[i]}
 		build_bench $bench
 	done
@@ -52,9 +55,8 @@ launch_reportable_specs(){
 	for ((i=0;i<${#SPEC_CORES[@]};++i)); do
 		bench=${BENCHS[i]}
 		core=${SPEC_CORES[i]}
-		#2>1 >/dev/null taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench &
-		taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench 2>&1 | tee -a $SPEC_OUTPUT/spec_reportable_core_$core &
-		echo "taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench 2>&1 | tee -a $SPEC_OUTPUT/spec_reportable_core_$core &" | tee -a $MON_LOG
+		taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench 2>&1 | tee -a $SPEC_CORE_OUTPUT/spec_reportable_core_$core &
+		echo "taskset -c $core runcpu --nobuild --action run --output-root $SPEC_OUTPUT $bench 2>&1 | tee -a $SPEC_CORE_OUTPUT/spec_reportable_core_$core &" | tee -a $MON_LOG
 	done
 }
 launch_workload_replicators(){
@@ -83,8 +85,8 @@ launch_workload_replicators(){
 				echo "assigning workload_replicator for $bench with pid $pid to core $core" | tee -a $MON_LOG
 				[ -z "$pid" ] && echo "pid for $bench on core $core not found" | tee -a $MON_LOG && return -1
 
-				echo "taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_OUTPUT/workload_rep_core_$core &" | tee -a $MON_LOG
-				taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_OUTPUT/workload_rep_core_$core &
+				echo "taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_CORE_OUTPUT/workload_rep_core_$core &" | tee -a $MON_LOG
+				taskset -c $MON_CORE ./workload_replicator.sh $core $bench $pid 2>&1 1>$SPEC_CORE_OUTPUT/workload_rep_core_$core &
 				
 			fi
 		done
@@ -96,7 +98,23 @@ launch_antagonists(){
 		taskset -c $core $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_stats_core_$core &
 	done
 }
+launch_antagonist_threads(){
+	taskset -c $(echo ${COMP_CORES[*]} | sed -e 's/ /,/g' -e 's/,$//') $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_log.txt &
+}
 
+run_all_spec_no_replacement(){
+	echo > $SPEC_LOG
+	echo > $MON_LOG
+	launch_antagonist_threads
+	launch_reportable_specs
+	taskset -c $MON_CORE ./experiment_terminator.sh
+}
+run_all_spec_no_replacement_no_antagonist(){
+	echo > $SPEC_LOG
+	echo > $MON_LOG
+	launch_reportable_specs
+	taskset -c $MON_CORE ./experiment_terminator.sh
+}
 run_all_spec_no_antagonist(){
 	echo > $SPEC_LOG
 	echo > $MON_LOG
