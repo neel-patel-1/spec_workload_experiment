@@ -7,18 +7,17 @@ export SPEC_CORE_OUTPUT=$TEST/spec_out/spec_cores
 export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
 export REPORTABLE=0
 
-SPEC_CORES=( 1 2 3 4 5 6 7 8 9 10 11 )
-SPEC_CORES=( 1 2   4 5   7 8 )
-#BENCHS=( "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" "lbm_s" "mcf_s" "fotonik3d_s" ) #memory intensive workloads
-#BENCHS=( "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" ) #memory intensive workloads
-BENCHS=( "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" ) #memory intensive workloads
+SPEC_CORES=( 1 2   4 5   7 8   10 11 )
+#BENCHS=( "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" ) #memory intensive workloads
+BENCHS=( "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" ) #memory intensive workloads
+#BENCHS=( "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" ) #memory intensive workloads
+export COMP_CORES=( "0" "3" "6" "9" )
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
 
 export ANTAGONIST=$TEST/antagonist.sh
 export ANTAGONIST_OUTPUT=$TEST/antagonist_output
-export COMP_CORES=( "3" "6" )
 
 export MON_CORE="0" #only check for workload completion and handle experiment termination
 
@@ -33,7 +32,6 @@ clear_build(){
 build_all(){
 	uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | sort | uniq` )
 	for bench in "${uniq_benchs[@]}"; do
-		bench=${BENCHS[i]}
 		build_bench $bench
 	done
 }
@@ -99,7 +97,12 @@ launch_antagonists(){
 	done
 }
 launch_antagonist_threads(){
+	echo "stdbuf -o0 taskset -c $(echo ${COMP_CORES[*]} | sed -e 's/ /,/g' -e 's/,$//') $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_log.txt &" | tee -a $MON_LOG
 	stdbuf -o0 taskset -c $(echo ${COMP_CORES[*]} | sed -e 's/ /,/g' -e 's/,$//') $ANTAGONIST 2>&1 1>$ANTAGONIST_OUTPUT/antagonist_log.txt &
+	while [ -z "$(pgrep lzbench)" ]; do
+		echo "waiting on antagonist threads" | tee -a $MON_LOG
+		sleep 2
+	done
 }
 
 run_all_spec_no_replacement(){
@@ -107,12 +110,14 @@ run_all_spec_no_replacement(){
 	echo > $MON_LOG
 	launch_antagonist_threads
 	launch_reportable_specs
+	sleep 10
 	taskset -c $MON_CORE ./experiment_terminator.sh
 }
 run_all_spec_no_replacement_no_antagonist(){
 	echo > $SPEC_LOG
 	echo > $MON_LOG
 	launch_reportable_specs
+	sleep 10
 	taskset -c $MON_CORE ./experiment_terminator.sh
 }
 run_all_spec_no_antagonist(){

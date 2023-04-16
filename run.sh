@@ -8,8 +8,14 @@ mkdir -p $BACKGROUND_OUTPUT
 mkdir -p $ANTAGONIST_OUTPUT
 
 
-build_all
-run_all_spec_no_replacement
+echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 
-mkdir -p antagonist_lbm_s_6x
-cp -r $SPEC_OUTPUT antagonist_lbm_s_6x
+#build_all
+#run_all_spec_with_antagonist
+launch_antagonist_threads
+sleep 2500
+kill_antagonist
+cp antagonist_output/antagonist_log.txt 4td_antagonist_baseline
+
+#mkdir -p antagonist_lbm_s_9x
+#cp -r $SPEC_OUTPUT antagonist_lbm_s_9x
