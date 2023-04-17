@@ -13,6 +13,6 @@ echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 build_all
 run_all_spec_no_replacement_no_antagonist
 
-mkdir -p perlbench_s_8x
-cp -r $SPEC_OUTPUT/result/* perlbench_s_8x
-cp antagonist_output/antagonist_log.txt perlbench_s_8x
+mkdir -p roms_s_8x
+cp -r $SPEC_OUTPUT/result/* roms_s_8x
+cp antagonist_output/antagonist_log.txt roms_s_8

@@ -8,14 +8,8 @@ export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
 export REPORTABLE=0
 
 SPEC_CORES=( 1 2   3 5   7 8   10 11 )
-#BENCHS=( "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" ) #memory intensive workloads
-#BENCHS=( "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" ) #memory intensive workloads
-#BENCHS=( "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" ) #memory intensive workloads
-#BENCHS=( "mcf_s" "lbm_s" "fotonik3d_s" "mcf_s" "lbm_s" "fotonik3d_s" "mcf_s" "lbm_s" ) #memory intensive workloads
-#BENCHS=( "lbm_s"  "lbm_s"  "fotonik3d_s" "fotonik3d_s"  "lbm_s"  "lbm_s" "fotonik3d_s"  "fotonik3d_s" ) #memory intensive workloads
-#BENCHS=( "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" ) #memory intensive workloads
-#BENCHS=( "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" ) #memory intensive workloads
-BENCHS=( "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" ) #memory intensive workloads
+BENCHS=( "roms_s" "roms_s" "perlbench_s" "perlbench_s" "roms_s" "roms_s" "perlbench_s" "perlbench_s" ) #memory intensive workloads
+BENCH_ALIASES=("sroms" "sroms" "perlbench_s" "perlbench_s" "sroms" "sroms" "perlbench_s" "perlbench_s")
 export COMP_CORES=( "0" "4" "6" "9" )
 
 export SPEC_LOG=spec_log.txt
@@ -44,6 +38,18 @@ build_all(){
 uniq_spec_pids(){
 	rs=()
 	for i in ${BENCHS[@]}; do 
+		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
+	done
+	for i in ${BENCH_IDS[@]}; do 
+		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
+	done
+	uniq_pids=( `printf "%s\n"  "${rs[@]}" | sort | uniq` )
+	echo "${uniq_pids[*]}"
+}
+
+uniq_spec_pids_aliases(){
+	rs=()
+	for i in ${BENCH_ALIASES[@]}; do 
 		[ ! -z "$(pgrep $i)" ] && rs+=( $(pgrep $i) ) 
 	done
 	for i in ${BENCH_IDS[@]}; do 
@@ -116,7 +122,7 @@ run_all_spec_no_replacement(){
 	launch_antagonist_threads
 	launch_reportable_specs
 	sleep 10
-	taskset -c $MON_CORE ./experiment_terminator.sh
+	#taskset -c $MON_CORE ./experiment_terminator.sh
 }
 run_all_spec_no_replacement_no_antagonist(){
 	echo > $SPEC_LOG
@@ -151,7 +157,7 @@ function kill_bench {
     fi
 }
 function kill_all_bench {
-	uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" "${BENCH_IDS[@]}" | sort | uniq` )
+	uniq_benchs=( `printf "%s %s %s\n"  "${BENCHS[@]}" "${BENCH_IDS[@]}" "${BENCH_ALIASES[@]}" | sort | uniq` )
 	for i in "${uniq_benchs[@]}"; do
 		bench=$i
 		kill_bench $bench
