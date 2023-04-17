@@ -20,3 +20,5 @@ done
 echo "all reportable spec procs ended, terminating experiment..." | tee -a $MON_LOG
 
 kill_experiment
+
+echo "EXPERIMENT ENDED" | tee -a $MON_LOG

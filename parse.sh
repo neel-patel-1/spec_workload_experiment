@@ -2,6 +2,7 @@
 
 source shared.sh
 dir=$TEST/spec_out/result
+#dir=$TEST/8x_fotonik_antagonist_4td
 echo "Benchmarks      Threads  Run Time     Ratio"
 uniq_benchs=( `printf "%s\n"  "${BENCHS[@]}" | sort | uniq` )
 

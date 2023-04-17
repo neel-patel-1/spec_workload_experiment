@@ -10,12 +10,9 @@ mkdir -p $ANTAGONIST_OUTPUT
 
 echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 
-#build_all
-#run_all_spec_with_antagonist
-launch_antagonist_threads
-sleep 2500
-kill_antagonist
-cp antagonist_output/antagonist_log.txt 4td_antagonist_baseline
+build_all
+run_all_spec_no_replacement_no_antagonist
 
-#mkdir -p antagonist_lbm_s_9x
-#cp -r $SPEC_OUTPUT antagonist_lbm_s_9x
+mkdir -p perlbench_s_8x
+cp -r $SPEC_OUTPUT/result/* perlbench_s_8x
+cp antagonist_output/antagonist_log.txt perlbench_s_8x

@@ -7,11 +7,16 @@ export SPEC_CORE_OUTPUT=$TEST/spec_out/spec_cores
 export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
 export REPORTABLE=0
 
-SPEC_CORES=( 1 2   4 5   7 8   10 11 )
+SPEC_CORES=( 1 2   3 5   7 8   10 11 )
 #BENCHS=( "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" "lbm_s" ) #memory intensive workloads
-BENCHS=( "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" ) #memory intensive workloads
+#BENCHS=( "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" "fotonik3d_s" ) #memory intensive workloads
 #BENCHS=( "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" "mcf_s" ) #memory intensive workloads
-export COMP_CORES=( "0" "3" "6" "9" )
+#BENCHS=( "mcf_s" "lbm_s" "fotonik3d_s" "mcf_s" "lbm_s" "fotonik3d_s" "mcf_s" "lbm_s" ) #memory intensive workloads
+#BENCHS=( "lbm_s"  "lbm_s"  "fotonik3d_s" "fotonik3d_s"  "lbm_s"  "lbm_s" "fotonik3d_s"  "fotonik3d_s" ) #memory intensive workloads
+#BENCHS=( "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" "omnetpp_s" ) #memory intensive workloads
+#BENCHS=( "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" "cactuBSSN_s" ) #memory intensive workloads
+BENCHS=( "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" "roms_s" ) #memory intensive workloads
+export COMP_CORES=( "0" "4" "6" "9" )
 
 export SPEC_LOG=spec_log.txt
 export MON_LOG=mon_log.txt
@@ -124,14 +129,16 @@ run_all_spec_no_antagonist(){
 	echo > $SPEC_LOG
 	echo > $MON_LOG
 	launch_reportable_specs
+	sleep 10
 	launch_workload_replicators
 	taskset -c $MON_CORE ./experiment_terminator.sh
 }
 run_all_spec_with_antagonist(){
 	echo > $SPEC_LOG
 	echo > $MON_LOG
-	launch_antagonists
+	launch_antagonist_threads
 	launch_reportable_specs
+	sleep 10
 	launch_workload_replicators
 	taskset -c $MON_CORE ./experiment_terminator.sh
 }
