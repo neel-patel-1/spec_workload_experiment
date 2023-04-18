@@ -70,19 +70,30 @@ launch_reportable_specs(){
 }
 launch_workload_replicators(){
 	# 1 - wait for all benchmarks to launch
-	uniq_pids=( $( uniq_spec_pids ) )
-	while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
-		sleep 2
+	if [ ! -z "${BENCH_ALIASES[0]}" ]; then
+		uniq_pids=( $(uniq_spec_pids_aliases) )
+		while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
+			sleep 2
+			uniq_pids=( $( uniq_spec_pids_aliases ) )
+			echo "Waiting for all spec benchs to start ${#uniq_pids[@]}/${#BENCHS[@]}" | tee -a $MON_LOG
+		done
+	else
 		uniq_pids=( $( uniq_spec_pids ) )
-		echo "Waiting for all spec benchs to start ${#uniq_pids[@]}/${#BENCHS[@]}" | tee -a $MON_LOG
-	done
+		while [ "${#uniq_pids[@]}" -lt "${#BENCHS[@]}" ]; do
+			sleep 2
+			uniq_pids=( $( uniq_spec_pids ) )
+			echo "Waiting for all spec benchs to start ${#uniq_pids[@]}/${#BENCHS[@]}" | tee -a $MON_LOG
+		done
+	fi
 
 	# 2 - assign workload replicators to relaunch benchmarks on the same core after reportable run termination
-	ID_itr=0
-	uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" | sort | uniq` )
+	if [ ! -z "${BENCH_ALIASES[0]}" ]; then
+		uniq_benchs=( `printf "%s %s\n"  "${BENCH_ALIASES[@]}" | sort | uniq` )
+	else
+		uniq_benchs=( `printf "%s %s\n"  "${BENCHS[@]}" | sort | uniq` )
+	fi
 	for i in "${uniq_benchs[@]}"; do
 		rem_pids=( $(pgrep $i) )
-		[ -z "$rem_pids" ] && rem_pids=( $(pgrep ${BENCH_IDS[$ID_itr]}) ) && ID_itr=$(( $ID_itr + 1 ))
 		[ -z "$rem_pids" ] && echo "pids for $i not found" | tee -a $MON_LOG && return -1
 		for ((j=0;j<${#BENCHS[@]};++j)); do
 			bench=${BENCHS[j]}
