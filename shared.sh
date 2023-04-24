@@ -8,8 +8,8 @@ export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
 export REPORTABLE=0
 
 SPEC_CORES=( 1 2   3 5   7 8   10 11 )
-BENCHS=( "roms_s" "roms_s" "perlbench_s" "perlbench_s" "roms_s" "roms_s" "perlbench_s" "perlbench_s" ) #memory intensive workloads
-BENCH_ALIASES=("sroms" "sroms" "perlbench_s" "perlbench_s" "sroms" "sroms" "perlbench_s" "perlbench_s")
+BENCHS=("perlbench_s" "perlbench_s" "perlbench_s" "perlbench_s" "perlbench_s" "perlbench_s" "perlbench_s" "perlbench_s")
+#BENCH_ALIASES=("sroms" "sroms" "perlbench_s" "perlbench_s" "sroms" "sroms" "perlbench_s" "perlbench_s")
 export COMP_CORES=( "0" "4" "6" "9" )
 
 export SPEC_LOG=spec_log.txt
@@ -133,7 +133,7 @@ run_all_spec_no_replacement(){
 	launch_antagonist_threads
 	launch_reportable_specs
 	sleep 10
-	#taskset -c $MON_CORE ./experiment_terminator.sh
+	taskset -c $MON_CORE ./experiment_terminator.sh
 }
 run_all_spec_no_replacement_no_antagonist(){
 	echo > $SPEC_LOG

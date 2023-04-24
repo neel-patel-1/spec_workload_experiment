@@ -11,8 +11,8 @@ mkdir -p $ANTAGONIST_OUTPUT
 echo "1" | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
 
 build_all
-run_all_spec_no_antagonist
+run_all_spec_no_replacement_no_antagonist
 
-mkdir -p roms_4x_perlbench_4x_
-cp -r $SPEC_OUTPUT/result/* roms_4x_perlbench_4x_
-cp antagonist_output/antagonist_log.txt roms_4x_perlbench_4x_
+mkdir -p perlbench8x_r2
+cp -r $SPEC_OUTPUT/result/* perlbench8x_r2
+cp antagonist_output/antagonist_log.txt perlbench8x_r2
