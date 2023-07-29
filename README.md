@@ -19,4 +19,11 @@ Experiment Repo Root (This Repo)
 ```
 
 ## Reproducing experimental results (fig. 10)
-./run.sh
+### Generating Results
+* Change SPEC\_ROOT in `shared.sh` to the root directory of a SPEC 2017 installation
+	* Follow instructions here to build spec: [SPEC\_2017 Quick Start Guide](https://www.spec.org/cpu2017/Docs/quick-start.html)
+* execute ./run.sh
+* Change SPEC\_CORES and BENCHS in `shared.sh` to the cores and workloads to corun with the (De)compression threads
+* Change COMP\_CORES to a non-overlapping set of cores on which to run the (de)compressor threads
+### Parsing Results
+* execute `./parse.sh` to view the runtimes of the executed SPEC workloads generated during the previous step
