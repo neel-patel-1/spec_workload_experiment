@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-export SPEC_ROOT=/home/n869p538/spec
+export SPEC_ROOT=/users/nmpatel/spec
 export SPEC_OUTPUT=$TEST/spec_out
 export SPEC_CORE_OUTPUT=$TEST/spec_out/spec_cores
 export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
