@@ -65,6 +65,8 @@ sudo apt install gfortran
 ./parse.sh # parse results and print SPEC Runtimes and Rates
 ```
 
+* Note: As SPEC 2017 is a licensed software, we ask reviewers and reproducers to consider gaining access to a SPEC 2017 distribution (e.g., in the form of a disk image `cpu2017-1_0_5.iso`) and attempt reproduction of the results above. Please reach out if this is infeasible and we will work to add freely accessible benchmarks to the set of corunning applications
+	* License: https://www.spec.org/cpu2017/Docs/licenses/SPEC-License.pdf
 
 * execute ./run.sh
 * Change SPEC\_CORES and BENCHS in `shared.sh` to the cores and workloads to corun with the (De)compression threads
