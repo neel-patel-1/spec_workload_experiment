@@ -26,7 +26,7 @@ Experiment Repo Root (This Repo)
 	* For MICRO 2023 Artifact Evaluators we have provided a genilib script and instructions for regenerating results on a cloudlab instance:
 
 
-#### Artifact Evaluator Instructions:
+#### Artifact Evaluation Instructions:
 To ease reproducibility for our artifact evaluators we have created a cloudlab environment and setup closely matching the server configuration used in the MICRO 2023 paper `XFM:Accelerating Far Memory using Near Memory Processing`
 
 Following the instructions below will provision a cloudlab instance in which the SPEC 2017 and (de)compression workloads
@@ -35,6 +35,9 @@ from the paper will be executed. For more information, refer to [`XFM:Accelerati
 * allocate a cloudlab instance using the genilib script provided in this repo
 	* Create a cloudlab account if needed
 	* Navigate to `Experiments`, then `Create Experiment Profile`, and upload `spec_eval.profile`
+
+* we have provided a SPEC 2017 Image which can be used for building an official SPEC 2017 benchmark set for the duration of the evaluation process
+	* it can be fetched via ``
 * prepare SPEC 2017 for workload evaluation
 
 ```sh
