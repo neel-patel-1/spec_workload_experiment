@@ -42,7 +42,6 @@ from the paper will be executed. For more information, refer to [`XFM:Accelerati
 
 ```sh
 mkdir spec_mnt
-mkdir 
 sudo mount -t iso9660 -o ro,exec,loop cpu2017-1_0_5.iso ./spec_mnt
 cd spec_mnt
 ./install.sh -d ../spec 
@@ -56,11 +55,17 @@ cp config/default.cfg  /users/<username>/spec/config/
 ```sh
 sudo apt update
 sudo apt install gfortran
+
 # change config/default.cfg gccdir to /usr
+
+cd lzbench
+make
 ```
-	* run jobmix1 configuration with and without (de)compression antagonists
+
+* run jobmix1 configuration with and without (de)compression antagonists
 
 ```sh
+./fetch_corpus.sh # fetches and prepares the corpus files for testing
 ./run.sh # run both spec jobmix1 configurations
 ./parse.sh # parse results and print SPEC Runtimes and Rates
 ```
