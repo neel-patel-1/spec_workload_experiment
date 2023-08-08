@@ -49,6 +49,9 @@ cd spec_mnt
 # change SPEC_ROOT to /users/<username>/spec in shared.sh
 
 cp config/default.cfg  /users/<username>/spec/config/
+
+cd lzbench
+make
 ```
 
 * install dependencies
@@ -57,9 +60,6 @@ sudo apt update
 sudo apt install gfortran
 
 # change config/default.cfg gccdir to /usr
-
-cd lzbench
-make
 ```
 
 * run jobmix1 configuration with and without (de)compression antagonists
