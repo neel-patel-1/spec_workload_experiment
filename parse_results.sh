@@ -20,6 +20,5 @@ done | tee with_antagonist.txt
 
 a_val=$(awk '$4~/RE/{count--} { sum += $3;count++ } END{ print sum/(count-1)}' with_antagonist.txt)
 echo "Degradation(%):"
-n_val=2300
 echo "(($a_val-$n_val)/$n_val) * 100 " 
 echo "scale=4; (($a_val- $n_val)/$n_val) * 100 " | bc
