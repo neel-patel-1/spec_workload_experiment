@@ -3,7 +3,7 @@
 * Corresponds to figure 10 in [XFM:Accelerating Far Memory using Near Memory Processing](https://www.micro56.org/)<br>
 
 ## Directory Hierarchy
-```sh
+```
 Experiment Repo Root (This Repo)
  |---- shared.sh - functions for starting/stopping SPEC processes ( modify spec workloads/core assignment here )
 
@@ -36,40 +36,52 @@ from the paper will be executed. For more information, refer to [`XFM:Accelerati
 	* Create a cloudlab account if needed
 	* Navigate to `Experiments`, then `Create Experiment Profile`, and upload `spec_eval.profile`
 
-* we have provided a SPEC 2017 Image which can be used for building an official SPEC 2017 benchmark set for the duration of the evaluation process
-	* it can be fetched via ``
-* prepare SPEC 2017 for workload evaluation
+* we have provided a SPEC 2017 Image which can be used during the duration of the Artifact Evaluation process only for reproducing the results in [`XFM:Accelerating Far Memory using Near Memory Processing`](https://www.micro56.org/). 
+* An official SPEC 2017 benchmark set for the duration of the evaluation process can be fetched via ``
+* Next prepare SPEC 2017 for workload evaluation:
 
 ```sh
 mkdir spec_mnt
-mkdir 
-sudo mount -t iso9660 -o ro,exec,loop cpu2017-1_0_5.iso ./spec_mnt
+mkdir spec
+sudo mount -t iso9660 -o ro,exec,loop /path/to/cpu2017-1_0_5.iso ./spec_mnt
 cd spec_mnt
 ./install.sh -d ../spec 
 
-# change SPEC_ROOT to /users/<username>/spec in shared.sh
+# respond with yes when prompted
 
-cp config/default.cfg  /users/<username>/spec/config/
+# change SPEC_ROOT to /path/to/spec in shared.sh
+
+# change config/default.cfg gcc_dir to /usr
+
+cp config/default.cfg  /path/to/spec/config/
 ```
 
 * install dependencies
 ```sh
 sudo apt update
 sudo apt install gfortran
-# change config/default.cfg gccdir to /usr
 ```
-	* run jobmix1 configuration with and without (de)compression antagonists
 
+* Build Compression/Decompression Antagonist thread workload and fetch sample files
 ```sh
+./fetch_corpus.sh
+cd lzbench
+make -j BUILD_STATIC=1
+```
+
+* run jobmix1 configuration with and without (de)compression antagonists
+```sh
+cd $spec_workload_experiment_root
 ./run.sh # run both spec jobmix1 configurations
 ./parse.sh # parse results and print SPEC Runtimes and Rates
 ```
 
-* Note: As SPEC 2017 is a licensed software, we ask reviewers and reproducers to consider gaining access to a SPEC 2017 distribution (e.g., in the form of a disk image `cpu2017-1_0_5.iso`) and attempt reproduction of the results above. Please reach out if this is infeasible and we will work to add freely accessible benchmarks to the set of corunning applications
+* Note: As SPEC 2017 is a licensed software, we ask reviewers only utilize the provided SPEC 2017 distribution (e.g., in the form of a disk image `cpu2017-1_0_5.iso`) for the use of reproducing the results presented in [`XFM:Accelerating Far Memory using Near Memory Processing`](https://www.micro56.org/).
 	* License: https://www.spec.org/cpu2017/Docs/licenses/SPEC-License.pdf
 
-* execute ./run.sh
+#### Testing other corunning workloads and configurations
 * Change SPEC\_CORES and BENCHS in `shared.sh` to the cores and workloads to corun with the (De)compression threads
 * Change COMP\_CORES to a non-overlapping set of cores on which to run the (de)compressor threads
-### Parsing Results
+
+#### Parsing Results
 * execute `./parse.sh` to view the runtimes of the executed SPEC workloads generated during the previous step
