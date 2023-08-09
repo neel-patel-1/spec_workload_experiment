@@ -7,9 +7,9 @@ export SPEC_CORE_OUTPUT=$TEST/spec_out/spec_cores
 export BACKGROUND_OUTPUT=$TEST/spec_out/spec_background
 export REPORTABLE=0
 
-SPEC_CORES=( 1 2   3 5   7 8   10 11 )
+SPEC_CORES=( 1 2   3 5   7 8   )
 #BENCHS=("lbm_s" "lbm_s" "lbm_s" "lbm_s" "omnetpps_s" "omnetpps_s" "omnetpps_s" "omnetpps_s" ) #jbmx_3
-BENCHS=("fotonik3d_s" "fotonik3d_s" "lbm_s" "lbm_s" "lbm_s" "mcf_s" "mcf_s" "mcf_s" ) #jbmx_1
+BENCHS=("fotonik3d_s" "fotonik3d_s" "lbm_s" "lbm_s"  "mcf_s" "mcf_s"  ) #jbmx_1
 #BENCH_ALIASES=("sroms" "sroms" "perlbench_s" "perlbench_s" "sroms" "sroms" "perlbench_s" "perlbench_s")
 export COMP_CORES=( "0" "4" "6" "9" )
 
