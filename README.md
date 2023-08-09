@@ -72,8 +72,7 @@ make -j BUILD_STATIC=1
 * run jobmix1 configuration with and without (de)compression antagonists
 ```sh
 cd $spec_workload_experiment_root
-./run.sh # run both spec jobmix1 configurations
-./parse.sh # parse results and print SPEC Runtimes and Rates
+./run.sh # run both spec jobmix1 configurations and print job degradation between antagonist and baseline configurations
 ```
 
 * Note: As SPEC 2017 is a licensed software, we ask reviewers only utilize the provided SPEC 2017 distribution (e.g., in the form of a disk image `cpu2017-1_0_5.iso`) for the use of reproducing the results presented in [`XFM:Accelerating Far Memory using Near Memory Processing`](https://www.micro56.org/).
