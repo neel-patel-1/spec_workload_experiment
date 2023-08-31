@@ -37,7 +37,7 @@ from the paper will be executed. For more information, refer to [`XFM:Accelerati
 	* Navigate to `Experiments`, then `Create Experiment Profile`, and upload `spec_eval.profile`
 
 * we have provided a SPEC 2017 Image which can be used during the duration of the Artifact Evaluation process only for reproducing the results in [`XFM:Accelerating Far Memory using Near Memory Processing`](https://www.micro56.org/). 
-* An official SPEC 2017 benchmark set for the duration of the evaluation process can be fetched via ``
+* An official SPEC 2017 benchmark set for the duration of the evaluation process can be fetched via `wget https://ae_private_resources.amazonaws.com/cpu2017-1_0_5.iso`
 * Next prepare SPEC 2017 for workload evaluation:
 
 ```sh
